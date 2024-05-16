@@ -1,4 +1,3 @@
-import { json } from "@remix-run/node";
 import {
   Form,
   NavLink,
@@ -12,20 +11,15 @@ import {
   useSubmit
 } from "@remix-run/react";
 
-
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-// existing imports
 import appStylesHref from "./app.css?url";
-
-import { getContacts } from "./data";
-
-import { createEmptyContact, getContacts } from "./data";
-
 import { json, redirect } from "@remix-run/node";
-import { useEffect } from "react";
+import { prisma } from "./db.server";
 
 export const action = async () => {
-  const contact = await createEmptyContact();
+  const contact = await prisma.contact.create({
+    data: {},
+  });
   return redirect(`/contacts/${contact.id}/edit`);
 };
 
@@ -38,9 +32,8 @@ export const loader = async ({
 }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const contacts = await getContacts(q);
-  console.log(q);
-  return json({ contacts, q });
+  const contacts = await prisma.contact.findMany()
+  return json({contacts, q})
 };
 
 export default function App() {
@@ -52,15 +45,6 @@ export default function App() {
     new URLSearchParams(navigation.location.search).has(
       "q"
     );
-
-  /*
-  useEffect(() => {
-    const searchField = document.getElementById("q");
-    if (searchField instanceof HTMLInputElement) {
-      searchField.value = q || "";
-    }
-  }, [q]);
-  */
 
   return (
     <html lang="en">
