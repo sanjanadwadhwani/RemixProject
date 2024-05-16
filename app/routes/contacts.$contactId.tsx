@@ -2,16 +2,20 @@ import type { ActionFunctionArgs,  LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useLoaderData, useFetcher} from "@remix-run/react";
 import type { FunctionComponent } from "react";
+import { prisma } from "../db.server";
+import invariant from "tiny-invariant";
 
 import type { ContactRecord } from "../data";
-import { getContact, updateContact } from "../data";
-import invariant from "tiny-invariant";
 
 export const loader = async ({
     params,
   }: LoaderFunctionArgs) => {
     invariant(params.contactId, "Missing contactId param");
-  const contact = await getContact(params.contactId);
+  const contact = await prisma.contact.findUnique({
+      where: {
+        id: parseInt(params.contactId),
+      },
+    });
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -24,8 +28,16 @@ export const action = async ({
 }: ActionFunctionArgs) => {
   invariant(params.contactId, "Missing contactId param");
   const formData = await request.formData();
-  return updateContact(params.contactId, {
-    favorite: formData.get("favorite") === "true",
+  const contact = await prisma.contact.findUnique({
+    where: {
+      id: parseInt(params.contactId),
+    },
+  });
+  return prisma.contact.update({
+    where: { id: parseInt(params.contactId) },
+    data: {
+      favorite: !contact.favorite,
+    },
   });
 };
 
