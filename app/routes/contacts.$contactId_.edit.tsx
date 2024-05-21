@@ -47,7 +47,7 @@ export default function EditContact() {
       <p>
         <span>Name</span>
         <input
-          defaultValue={contact.first}
+          defaultValue= {contact.first} 
           aria-label="First name"
           name="first"
           type="text"
