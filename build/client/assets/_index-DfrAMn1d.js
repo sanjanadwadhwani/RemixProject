@@ -1,1 +1,0 @@
-import{r,j as e}from"./jsx-runtime-DwnNtzXp.js";function t(){return r.useState(!1),e.jsxs("p",{id:"index-page",children:["This is a demo for Remix.",e.jsx("br",{}),"Check out"," ",e.jsx("a",{href:"https://remix.run",children:"the docs at remix.run"}),"."]})}export{t as default};

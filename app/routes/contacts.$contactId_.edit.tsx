@@ -45,7 +45,7 @@ export default function EditContact() {
   return (
     <Form key={contact.id} id="contact-form" method="post">
       <p>
-        <span>Name</span>
+        <span className = "text-gray-700">Name</span>
         <input
           defaultValue= {contact.first} 
           aria-label="First name"

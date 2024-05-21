@@ -19,13 +19,29 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
-
+import { Check, ChevronsUpDown } from "lucide-react"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "../@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../@/components/ui/popover"
+ 
+import { cn } from '../@/libs/util';
 import "../styles/tailwind.css";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import appStylesHref from "./app.css?url";
 import { json, redirect } from "@remix-run/node";
 import { prisma } from "./db.server";
+import React from "react";
 
 export const action = async () => {
   const contact = await prisma.contact.create({
@@ -37,6 +53,7 @@ export const action = async () => {
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ];
+ 
 
 export const loader = async ({
   request,
@@ -63,6 +80,17 @@ export default function App() {
       "q"
     );
 
+    const [open, setOpen] = React.useState(false);
+    const [value, setValue] = React.useState("");
+    const [searchResults, setSearchResults] = React.useState(contacts);
+  
+
+  
+    React.useEffect(() => {
+      setSearchResults(contacts);
+    }, [contacts]);
+
+
   return (
     <html lang="en">
       <head>
@@ -75,42 +103,67 @@ export default function App() {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button id="searchButton">Search</Button>
-              </DialogTrigger>
-              <DialogContent className="fixed">
-                <div id="sidebar">
-                <DialogHeader>
-                  <DialogTitle>Search</DialogTitle>
-                  <DialogDescription>
-                  <Form id="search-form"
-                    onChange={(event) => {
-                      const isFirstSearch = q === null;
-                      submit(event.currentTarget, {
-                        replace: !isFirstSearch,
-                      });
-                    }}
-                    role="search"
-                  >
-                    <input
-                      id="q"
-                      aria-label="Search contacts"
-                      className={searching ? "loading" : ""}
-                      defaultValue={q || ""}
-                      placeholder="Search"
-                      type="search"
-                      name="q"
-                    />
-                  </Form>
-                  </DialogDescription>
-                </DialogHeader>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Form method="post">
-              <button type="submit">New</button>
-            </Form>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button id="searchButton">Search</Button>
+                </DialogTrigger>
+                <DialogContent className="relative">
+                  <div id = "sidebar">
+                  <DialogHeader >
+                    <DialogTitle>Search</DialogTitle>
+                    <DialogDescription>
+                    <Form id="search-form"
+                      onChange={(event) => {
+                        const isFirstSearch = q === null;
+                        submit(event.currentTarget, {
+                          replace: !isFirstSearch,
+                        });
+                      }}
+                      role="search"
+                    >
+                      <input
+                        id="q"
+                        aria-label="Search contacts"
+                        className={searching ? "loading" : ""}
+                        defaultValue={q || ""}
+                        placeholder="Search"
+                        type="search"
+                        name="q"
+                      />
+                    </Form>
+
+                    
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                          >
+                            {value
+                              ? contacts.find((contact) => contact.first === value)?.first
+                              : "Select contact..."}
+                            <ChevronsUpDown />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <Command>
+                            <CommandInput placeholder="Search contact..." />
+                            <CommandEmpty>No contact found.</CommandEmpty>
+                            <CommandGroup>
+                  
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </DialogDescription>
+                  </DialogHeader>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Form method="post">
+                <button type="submit">New</button>
+              </Form>
           </div>
           <nav>
             {contacts.length ? (
