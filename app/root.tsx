@@ -31,8 +31,34 @@ export const loader = async ({
   request,
 }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const q = url.searchParams.get("q");
-  const contacts = await prisma.contact.findMany()
+  const q = url.searchParams.get("q") || "";
+  const contacts = await prisma.contact.findMany({
+    where: {
+      first: {
+        contains: q,
+      }
+    }
+  });
+  /*
+  ({
+        where: {
+          OR: [
+            {
+              first: {
+                contains: q,
+              }
+            },
+            {
+              last: {
+                contains: q,
+              }
+            }
+          ],
+        },
+    });
+  };
+  */
+
   return json({contacts, q})
 };
 
