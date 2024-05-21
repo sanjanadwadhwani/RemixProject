@@ -10,7 +10,18 @@ import {
   useNavigation,
   useSubmit
 } from "@remix-run/react";
+import {Button} from '../@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
+import "../styles/tailwind.css";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import appStylesHref from "./app.css?url";
 import { json, redirect } from "@remix-run/node";
@@ -39,26 +50,6 @@ export const loader = async ({
       }
     }
   });
-  /*
-  ({
-        where: {
-          OR: [
-            {
-              first: {
-                contains: q,
-              }
-            },
-            {
-              last: {
-                contains: q,
-              }
-            }
-          ],
-        },
-    });
-  };
-  */
-
   return json({contacts, q})
 };
 
@@ -84,30 +75,42 @@ export default function App() {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Form id="search-form"
-              onChange={(event) => {
-                const isFirstSearch = q === null;
-                submit(event.currentTarget, {
-                  replace: !isFirstSearch,
-                });
-              }}
-              role="search"
-            >
-              <input
-                id="q"
-                aria-label="Search contacts"
-                className={searching ? "loading" : ""}
-                defaultValue={q || ""}
-                placeholder="Search"
-                type="search"
-                name="q"
-              />
-              <div id="search-spinner" aria-hidden hidden={!searching} />
-            </Form>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button id="searchButton">Search</Button>
+              </DialogTrigger>
+              <DialogContent className="fixed">
+                <div id="sidebar">
+                <DialogHeader>
+                  <DialogTitle>Search</DialogTitle>
+                  <DialogDescription>
+                  <Form id="search-form"
+                    onChange={(event) => {
+                      const isFirstSearch = q === null;
+                      submit(event.currentTarget, {
+                        replace: !isFirstSearch,
+                      });
+                    }}
+                    role="search"
+                  >
+                    <input
+                      id="q"
+                      aria-label="Search contacts"
+                      className={searching ? "loading" : ""}
+                      defaultValue={q || ""}
+                      placeholder="Search"
+                      type="search"
+                      name="q"
+                    />
+                  </Form>
+                  </DialogDescription>
+                </DialogHeader>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Form method="post">
               <button type="submit">New</button>
             </Form>
-
           </div>
           <nav>
             {contacts.length ? (
@@ -115,20 +118,20 @@ export default function App() {
                 {contacts.map((contact) => (
                   <li key={contact.id}>
                     <NavLink
-          className={({ isActive, isPending }) =>
-            isActive
-              ? "active"
-              : isPending
-              ? "pending"
-              : ""
-          }
-          to={`contacts/${contact.id}`}
-        >
-          {contact.first || contact.last ? (
-            <>
-              {contact.first} {contact.last}
-            </>
-          ) : (
+                      className={({ isActive, isPending }) =>
+                        isActive
+                          ? "active"
+                          : isPending
+                          ? "pending"
+                          : ""
+                      }
+                      to={`contacts/${contact.id}`}
+                    >
+                      {contact.first || contact.last ? (
+                        <>
+                          {contact.first} {contact.last}
+                        </>
+                      ) : (
                         <i>No Name</i>
                       )}{" "}
                       {contact.favorite ? (
@@ -145,10 +148,10 @@ export default function App() {
             )}
           </nav>
         </div>
-        
+
         <div className={
-            navigation.state === "loading" ? "loading" : ""
-          } id="detail">
+          navigation.state === "loading" ? "loading" : ""
+        } id="detail">
           <Outlet />
         </div>
         <ScrollRestoration />
