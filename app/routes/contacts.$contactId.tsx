@@ -103,12 +103,6 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
             <button type="submit">Delete</button>
           </Form>
         </div>
-        <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
-          />
       </div>
     </div>
   );
