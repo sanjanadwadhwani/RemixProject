@@ -6,6 +6,8 @@ import { prisma } from "../db.server";
 import invariant from "tiny-invariant";
 
 import type { ContactRecord } from "../data";
+import {Calendar} from '../../@/components/ui/calendar';
+import React from "react";
 
 export const loader = async ({
     params,
@@ -45,6 +47,7 @@ export default function Contact() {
   
 const { contact } = useLoaderData<typeof loader>();
 
+const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   return (
     <div id="contact">
