@@ -8,12 +8,9 @@ import {Button} from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import type { ContactRecord } from "../data";
 import {
@@ -27,52 +24,6 @@ import {
   TableRow,
 } from '../../@/components/ui/table';
 import React from "react";
-import Payment from '@prisma/client';
-
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-] 
 
 export const loader = async ({
     params,
@@ -102,7 +53,8 @@ export const action = async ({
       const date = new Date(formData.get("Date") as string);
       const payment = parseFloat(formData.get("Payment") as string);
       const account = parseInt(formData.get("Account") as string);
-      const status = formData.get("Status") === "on";
+      const status = formData.get("Status") === "Reported";
+      console.log(status);
       return prisma.payment.create({
         data: {
           date,
@@ -136,8 +88,9 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   return (
     <div id="contact">
-      <div>
-        <img
+      <div className="flex-none">
+        <img 
+          className="object-cover w-full h-full"
           alt={`${contact.first} ${contact.last} avatar`}
           key={contact.avatar}
           src={contact.avatar}
@@ -166,6 +119,27 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
           </p>
         ) : null}
 
+        <p>
+          <strong>Phone Number: </strong>
+          {contact.phone ? (() => {
+            const digits = contact.phone.replace(/\D/g, '');
+            const match = digits.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+              return `(${match[1]}) ${match[2]}-${match[3]}`;
+            }
+            return contact.phone;
+          })() : "N/A"}
+        </p>
+
+        <p>
+          <strong>Birthday: </strong>
+          {contact.birthday ? 
+            new Date(contact.birthday).toLocaleDateString('en-US', { timeZone: 'UTC' }) :
+            "N/A"
+          }
+        </p>
+
+
         {contact.notes ? <p>{contact.notes}</p> : null}
 
         <div>
@@ -189,33 +163,35 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
           </Form>
           
         </div>
-        <div>
-        <Table className="border-4">
-          <TableHeader className="border-2">
-            <TableRow>
-              <TableHead className = "w-1/4">Date</TableHead>
-              <TableHead className = "w-1/4">Payment</TableHead>
-              <TableHead className = "w-1/4">Account</TableHead>
-              <TableHead className = "w-1/4">Status</TableHead>
+        <div  className="rounded-lg border bg-white border-gray-300 font-sansserif p-1">
+        <Table className="text-left min-w-full">
+            <div className="px-2">
+          <TableHeader >
+            <TableRow >
+              <TableHead className="brandblue py-3 text-center text-sm font-bold" >Date</TableHead>
+              <TableHead className="brandblue py-3 text-center text-sm font-bold" >Payment</TableHead>
+              <TableHead className="brandblue py-3 text-center text-sm font-bold">Account</TableHead>
+              <TableHead className="brandblue py-3 text-center text-sm font-bold">Status</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className = "text-sm text-gray-700">
             {payments.map((record: { id: React.Key | null | undefined; date: string | number | Date; payment: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; account: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; status: any; }) => (
-              <TableRow key={record.id}>
-                <TableCell className="font-medium">{new Date(record.date).toLocaleDateString()}</TableCell>
-                <TableCell>{`$${record.payment}`}</TableCell>
-                <TableCell>{record.account}</TableCell>
-                <TableCell className="text-right">
-                  <div className="rounded-full text-white bg-green-600 p-2">
-                  {record.status ? 'Pending' : 'Reported'}
+              <TableRow className = "border-b" key={record.id}>
+                <TableCell className="py-2 whitespace-nowrap font-medium">{new Date(record.date).toLocaleDateString('en-US', {year:'2-digit', month:'numeric', day:'numeric'})}</TableCell>
+                <TableCell className="py-2 whitespace-nowrap font-medium">{`$${record.payment}`}</TableCell>
+                <TableCell className="py-1 whitespace-nowrap font-medium">{record.account}</TableCell>
+                <TableCell  className="py-2 whitespace-nowrap font-medium">
+                  <div className ={`rounded-md text-center px-2 py-1 ${record.status === true ? 'statuscolors' : 'uiyellow'}`}>
+                    {record.status ? 'Reported' : 'Pending'}
                   </div>
-                </TableCell>
+                </TableCell>  
               </TableRow>
             ))}
           </TableBody>
+          </div>
         </Table>
         </div>
-        <Dialog>
+        <Dialog >
                 <DialogTrigger asChild>
                   <Button>Add Payment</Button>
                 </DialogTrigger>
@@ -226,13 +202,13 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
                   </DialogHeader>
                   
                   <Form method = "post">
-                  <p>
+                  <p className = "py-2">
                     <input 
                       type="hidden" 
                       name="intent" 
                       value="addPayment" 
                     />
-                    <span className = "text-gray-700">Date</span>
+                    <span className = "text-gray-700 brandblue px-3 text-sm font-bold">Date</span>
                     <input
                       aria-label="Date"
                       defaultValue = ""
@@ -240,8 +216,8 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
                       type="date"
                     />
                   </p>
-                  <p>
-                    <span className = "text-gray-700">Payment</span>
+                  <p className = "py-2">                
+                    <span className = "text-gray-700 brandblue px-3 text-sm font-bold">Payment</span>
                     <input
                       aria-label="Payment"
                       defaultValue=""
@@ -250,8 +226,8 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
                       type="text"
                     />
                   </p>
-                  <p>
-                    <span className = "text-gray-700">Account</span>
+                  <p className = "py-2">
+                    <span className = "text-gray-700 brandblue px-3 text-sm font-bold">Account</span>
                     <input
                       aria-label="Account"
                       defaultValue=""
@@ -260,19 +236,18 @@ const [date, setDate] = React.useState<Date | undefined>(new Date())
                       type="text"
                     />
                   </p>
-                  <p>
-                    <span className = "text-gray-700 p-2">Reported?</span>
+                  <p className = "py-2">
+                    <span className = "text-gray-700 brandblue px-3 text-sm font-bold">Reported?</span>
                     <input
                       aria-label="Reported?"
-                      defaultValue=""
-                      name="Account"
-                      placeholder="Account"
+                      name="Status"
+                      value="Reported"  
                       type="checkbox"
                     />
                   </p>
-      
-                  <button type="submit">Add</button>
-          
+                  <div className = "p-4 absolute right-0">
+                  <button className = "text-lg" type="submit">Add</button>
+                  </div>
                   </Form>
                   
                 </DialogContent>
@@ -305,6 +280,7 @@ const Favorite: FunctionComponent<{
             ? "Remove from favorites"
             : "Add to favorites"
         }
+        className = "bg"
         name="favorite"
         value={favorite ? "false" : "true"}
       >

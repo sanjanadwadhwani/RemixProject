@@ -14,6 +14,11 @@ export const action = async ({
   invariant(params.contactId, "Missing contactId param");
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
+  if (updates.birthday) {
+    updates.birthday = new Date(updates.birthday).toISOString();
+  } else {
+    delete updates.birthday; 
+  }
   await prisma.contact.update({
     where: { id: parseInt(params.contactId) },
     data: updates,
@@ -78,6 +83,33 @@ export default function EditContact() {
           name="avatar"
           placeholder="https://example.com/avatar.jpg"
           type="text"
+        />
+      </label>
+      <label>
+        <span>Phone Number</span>
+        <input
+          aria-label="Phone"
+          defaultValue = {(() => {
+            if (contact.phone) {
+              const formatted = contact.phone.replace(/\D/g, '').match(/^(\d{3})(\d{3})(\d{4})$/);
+              if (formatted) {
+                return `(${formatted[1]}) ${formatted[2]}-${formatted[3]}`;
+              }
+              return contact.phone;
+            }
+          })()}
+          name="phone"
+          placeholder="000-000-0000"
+          type="text"
+        />
+      </label>
+      <label>
+        <span>Birthday</span>
+        <input
+          aria-label="Birthday"
+          defaultValue={contact.birthday ? new Date(contact.birthday).toISOString().slice(0, 10) : ''}
+          name="birthday"
+          type="date"
         />
       </label>
       <label>

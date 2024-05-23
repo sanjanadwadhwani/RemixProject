@@ -47,28 +47,6 @@ import { cn } from '../@/libs/util';
 import React from "react";
 
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-]
 
 export const action = async () => {
   const contact = await prisma.contact.create({
@@ -120,45 +98,46 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className = "bg">
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button id="searchButton">Search</Button>
+                  <Button className = "font-sansserif text-lg" id="searchButton">Search</Button>
                 </DialogTrigger>
 
                 <DialogContent className="absolute left-0 inset-0">
-                <div id = "sidebar" className="h-full p-4">
+                <div id = "sidebar" className="h-full">
                   <DialogHeader >
-                    <DialogTitle>Search</DialogTitle>
+                    <DialogTitle className = "text-center">Search</DialogTitle>
                     <DialogDescription>
-                    
-                    
+
                     
                     </DialogDescription>
                   </DialogHeader>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                      >
+                  <div className="p-4">
+                  <Popover open={open} onOpenChange={setOpen} >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="flex justify-between items-center bg font-sansserif text-lg w-full px-4 py-2 rounded shadow"
+                    >
                       {selectedContact ? `${selectedContact.first} ${selectedContact.last}` : "Select contact..."}
-                      <ChevronsUpDown/>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
+                      <ChevronsUpDown />
+                    </Button>
+                  </PopoverTrigger>
+                    <PopoverContent className = "bg">
                       <div className="flex flex-col">
                       <Command>
                         <CommandInput placeholder="Search contacts..."/>
                         <CommandEmpty>No contat found.</CommandEmpty>
                         <CommandList>
-                        <CommandGroup>
+                        <CommandGroup className = "text-gray-700 ">
                           {contacts.map((contact) => (
-                            <CommandItem
+                            <CommandItem className="py-2 whitespace-nowrap font-medium border-b"
                               key={contact.id}
                               value= {`${contact.first} ${contact.last}`}
                               onSelect={(currentValue) => {
@@ -178,15 +157,16 @@ export default function App() {
                       </div>
                     </PopoverContent>
                   </Popover>
-                  <DialogClose className="absolute bottom-0 left-0 p-1">
-                    <p>Close</p>
+                  </div>
+                  <DialogClose className="absolute left-0">
+                    <p>X</p>
                     </DialogClose>
                   </div>
                 </DialogContent>
   
               </Dialog>
               <Form method="post">
-                <button type="submit">New</button>
+                <button className = "font-sansserif text-lg" type="submit">New</button>
               </Form>
           </div>
           

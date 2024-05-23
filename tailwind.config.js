@@ -17,6 +17,10 @@ module.exports = {
       },
     },
     extend: {
+      spacing: {
+        '16': '64px', 
+        '6': '24px' 
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -51,6 +55,10 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'ui-yellow-200': {
+          DEFAULT: "hsl(var(--ui-yellow-200))", 
+          foreground: "hsl(var(--ui-yellow-200-foreground))"
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

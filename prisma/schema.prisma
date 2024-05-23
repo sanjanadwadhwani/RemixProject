@@ -1,21 +1,24 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
 model Contact {
-  id        Int    @id @default(autoincrement())
-  first     String?
-  last      String?
-  avatar    String?
-  twitter   String?
-  notes     String?
-  favorite  Boolean?
-  payments  Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id       Int       @id @default(autoincrement())
+  first    String?
+  last     String?
+  avatar   String?
+  twitter  String?
+  phone    String?
+  birthday DateTime?
+  notes    String?
+  favorite Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  payments Payment[]
 }
 
 model Payment {
@@ -24,7 +27,6 @@ model Payment {
   payment   Int
   account   Int
   status    Boolean
-  contactId Int 
+  contactId Int
   contact   Contact  @relation(fields: [contactId], references: [id])
 }
-
