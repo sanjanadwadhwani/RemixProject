@@ -5,7 +5,6 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate} from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { getContact, updateContact } from "../data";
 import { prisma } from "../db.server";
 
 export const action = async ({
@@ -15,6 +14,11 @@ export const action = async ({
   invariant(params.contactId, "Missing contactId param");
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
+  if (updates.birthday) {
+    updates.birthday = new Date(updates.birthday).toISOString();
+  } else {
+    delete updates.birthday; 
+  }
   await prisma.contact.update({
     where: { id: parseInt(params.contactId) },
     data: updates,
@@ -42,6 +46,7 @@ export const loader = async ({
 export default function EditContact() {
   const { contact } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+
   return (
     <Form key={contact.id} id="contact-form" method="post">
       <p>
@@ -81,6 +86,33 @@ export default function EditContact() {
         />
       </label>
       <label>
+        <span>Phone Number</span>
+        <input
+          aria-label="Phone"
+          defaultValue = {(() => {
+            if (contact.phone) {
+              const formatted = contact.phone.replace(/\D/g, '').match(/^(\d{3})(\d{3})(\d{4})$/);
+              if (formatted) {
+                return `(${formatted[1]}) ${formatted[2]}-${formatted[3]}`;
+              }
+              return contact.phone;
+            }
+          })()}
+          name="phone"
+          placeholder="000-000-0000"
+          type="text"
+        />
+      </label>
+      <label>
+        <span>Birthday</span>
+        <input
+          aria-label="Birthday"
+          defaultValue={contact.birthday ? new Date(contact.birthday).toISOString().slice(0, 10) : ''}
+          name="birthday"
+          type="date"
+        />
+      </label>
+      <label>
         <span>Notes</span>
         <textarea
           defaultValue={contact.notes}
@@ -92,6 +124,8 @@ export default function EditContact() {
         <button type="submit">Save</button>
         <button onClick={() => navigate(-1)}type="button">Cancel</button>
       </p>
+
+      
     </Form>
   );
 }
